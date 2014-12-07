@@ -266,4 +266,29 @@ inline Vector cross(const Vector& v1, const Vector& v2)
 
 typedef Vector Point;
 
+inline void makeCoordinateSpace(const Vector& normalRef,
+	Vector& outXAxis, Vector& outYAxis, Vector& outZAxis)
+{
+	outZAxis = normalRef.normalized();
+	Vector v2 = (outZAxis.x != 0.0f || outZAxis.z != 0.0f) ?
+		Vector(0.0f, 1.0f, 0.0f) :
+		Vector(1.0f, 0.0f, 0.0f);
+	outXAxis = cross(v2, outZAxis);
+	outYAxis = cross(outZAxis, outXAxis);
+}
+
+inline Vector transformToLocalSpace(const Vector& v,
+	const Vector& xAxis, const Vector& yAxis, const Vector& zAxis)
+{
+	return Vector(dot(v, xAxis), dot(v, yAxis), dot(v, zAxis));
+}
+
+inline Vector transformFromLocalSpace(const Vector& v,
+	const Vector& xAxis, const Vector& yAxis, const Vector& zAxis)
+{
+	return Vector(v.x * xAxis.x + v.y * yAxis.x + v.z * zAxis.x,
+		v.x * xAxis.y + v.y * yAxis.y + v.z * zAxis.y,
+		v.x * xAxis.z + v.y * yAxis.z + v.z * zAxis.z);
+}
+
 #endif

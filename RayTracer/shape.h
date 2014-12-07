@@ -6,8 +6,7 @@
 
 #include "maths.h"
 #include "ray.h"
-
-class Material;
+#include "material.h"
 
 class Shape
 {
