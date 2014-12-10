@@ -1,4 +1,5 @@
 #include "shape.h"
+#include "sampling.h"
 
 bool Shape::sampleSurface(
 	const Point& refPosition,
@@ -227,4 +228,67 @@ bool Sphere::doesIntersect(const Ray& ray)
 	{
 		return false;
 	}
+}
+
+bool Sphere::sampleSurface(const Point& refPosition,
+	const Vector& refNormal,
+	float u1, float u2, float u3,
+	Point& outPosition,
+	Vector& outNormal,
+	float& outPdf)
+{
+	Vector toCenter = origin - refPosition;
+	float dist2 = toCenter.length2();
+	if (dist2 < squared(radius) * 1.00001f)
+	{
+		// Point is on or in the sphere
+		outNormal = uniformToSphere(u1, u2);
+		outPosition = origin + outNormal * radius;
+		Vector toSurf = refPosition - outPosition;
+		outPdf = toSurf.length2() * surfaceAreaPDF() / std::fabs(dot(toSurf.normalized, outNormal));
+		return true;
+	}
+
+	// Outside the sphere, fit a cone around to sample more efficiently
+	float sinThetaMax2 = squared(radius) / dist2;
+	float cosThetaMax = std::sqrt(std::max(0.0f, 1 - sinThetaMax2));
+	Vector x, y, z;
+	makeCoordinateSpace(toCenter, x, y, z);
+	Vector localCone = uniformToCone(u1, u2, cosThetaMax);
+	Vector cone = transformFromLocalSpace(localCone, x, y, z);
+
+	// Make sure direction hits sphere
+	Ray ray(refPosition, cone);
+	Intersection isect(ray);
+	if (!intersect(isect))
+		isect.dist = dot(toCenter, cone);
+
+	outPosition = ray.calc(isect.dist);
+	outNormal = (outPosition - origin).normalized();
+	outPdf = uniformConePdf(cosThetaMax);
+	return true;
+}
+
+float Sphere::pdfSA(const Point& refPosition,
+	const Vector& refNormal,
+	const Point& surfPosition,
+	const Vector& surfNormal) const
+{
+	Vector toCenter = origin - refPosition;
+	float dist2 = toCenter.length2();
+	if (dist2 > squared(radius) * 1.00001f)
+	{
+		// Point is on or in the sphere
+		Vector toSurf = refPosition - surfPosition;
+		return toSurf.length2() * surfaceAreaPDF() / std::fabs(dot(toSurf.normalized(), surfNormal));
+	}
+
+	float sinThetaMax2 = squared(radius) / dist2;
+	float cosThetaMax = std::sqrt(std::max(0.0f, 1.0f - sinThetaMax2));
+	return uniformConePdf(cosThetaMax);
+}
+
+float Sphere::surfaceAreaPdf() const
+{
+	return 3.0f / (4.0f * M_PI * squared(radius));
 }

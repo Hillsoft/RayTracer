@@ -99,6 +99,20 @@ public:
 	virtual bool intersect(Intersection& intersection);
 	virtual bool doesIntersect(const Ray& ray);
 
+	virtual bool sampleSurface(const Point& refPosition,
+		const Vector& refNormal,
+		float u1, float u2, float u3,
+		Point& outPosition,
+		Vector& outNormal,
+		float& outPdf);
+
+	virtual float pdfSA(const Point& refPosition,
+		const Vector& refNormal,
+		const Point& surfPosition,
+		const Vector& surfNormal) const;
+
+	virtual float surfaceAreaPdf() const;
+
 protected:
 	Point origin;
 	float radius;
