@@ -19,7 +19,7 @@ struct Color
 	Color(float r, float g, float b) : r(r), g(g), b(b) {}
 	explicit Color(float intensity) : r(intensity), g(intensity), b(intensity) {}
 
-	inline void clamp(float min = 0.0f, float max = 0.0f)
+	inline void clamp(float min = 0.0f, float max = 1.0f)
 	{
 		r = std::max(std::min(r, max), min);
 		g = std::max(std::min(g, max), min);
