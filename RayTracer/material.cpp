@@ -75,7 +75,7 @@ float Lambert::pdfSA(const Vector& incoming, const Vector& outgoing, const Vecto
 	return std::fabs(nDotI) / M_PI;
 }
 
-float Lambert::pdfSA(const Vector& incoming, const Vector& outgoing, const Vector& normal) const
+float Lambert::pdfPSA(const Vector& incoming, const Vector& outgoing, const Vector& normal) const
 {
 	float nDotI = dot(incoming, normal);
 	float nDotO = dot(outgoing, normal);
@@ -167,7 +167,7 @@ float Glossy::sampleSA(Vector& outIncoming, const Vector& outgoing, const Vector
 	return evaluateSA(outIncoming, outgoing, normal, outPdf);
 }
 
-float Glossy::sampleSA(Vector& outIncoming, const Vector& outgoing, const Vector& normal, float u1, float u2, float& outPdf) const
+float Glossy::samplePSA(Vector& outIncoming, const Vector& outgoing, const Vector& normal, float u1, float u2, float& outPdf) const
 {
 	float phi = 2.0f * M_PI * u1;
 	float cosTheta = std::pow(1.0f - u2, 1.0f / (exponent + 1.0f));

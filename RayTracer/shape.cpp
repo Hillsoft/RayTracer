@@ -245,7 +245,7 @@ bool Sphere::sampleSurface(const Point& refPosition,
 		outNormal = uniformToSphere(u1, u2);
 		outPosition = origin + outNormal * radius;
 		Vector toSurf = refPosition - outPosition;
-		outPdf = toSurf.length2() * surfaceAreaPDF() / std::fabs(dot(toSurf.normalized, outNormal));
+		outPdf = toSurf.length2() * surfaceAreaPDF() / std::fabs(dot(toSurf.normalized(), outNormal));
 		return true;
 	}
 
